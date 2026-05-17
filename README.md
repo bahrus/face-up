@@ -72,7 +72,7 @@ Dispatch events on the host's `propagator` to update the form value:
 ```js
 // From within the custom element:
 this.propagator.dispatchEvent(
-    new CustomEvent('value', { detail: 'new value' })
+    new Event('value')
 );
 ```
 
