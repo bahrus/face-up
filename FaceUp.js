@@ -13,12 +13,26 @@
  * - Be labeled with <label> elements
  *
  * The host custom element MUST:
- * - Set `static formAssociated = true`
  * - Call `this.attachInternals()` and pass the result via getSharedContext
+ *
+ * `static formAssociated = true` is set automatically via `static onAssigned`.
  *
  * @implements {FaceUpProps}
  */
 class FaceUp {
+
+    /**
+     * Called once by assignFeatures after registration.
+     * Sets `static formAssociated = true` on the host constructor so the
+     * consumer doesn't need to declare it manually.
+     * @param {Function} ctr - The custom element constructor
+     * @param {object} _featureConfig - The feature config (unused)
+     */
+    static onAssigned(ctr, _featureConfig) {
+        if (!ctr.formAssociated) {
+            ctr.formAssociated = true;
+        }
+    }
     /** @type {WeakRef<HTMLElement> | undefined} */
     #hostRef;
 

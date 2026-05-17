@@ -11,10 +11,9 @@
 
         /**
          * A test custom element that uses FaceUp to become form-associated.
+         * Note: static formAssociated = true is set automatically by FaceUp.onAssigned
          */
         class TestInput extends HTMLElement {
-            static formAssociated = true;
-
             propagator = new EventTarget();
             #internals;
 
@@ -79,8 +78,8 @@
             }
         }
 
-        // Inject the FaceUp feature
-        customElements.assignFeatures(TestInput, {
+        // Inject the FaceUp feature (onAssigned sets static formAssociated = true)
+        await customElements.assignFeatures(TestInput, {
             faceUp: { spawn: FaceUp }
         });
 

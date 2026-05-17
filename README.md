@@ -20,8 +20,6 @@ import 'assign-gingerly/assignFeatures.js';
 import { FaceUp } from 'face-up/FaceUp.js';
 
 class MyInput extends HTMLElement {
-    static formAssociated = true;
-
     propagator = new EventTarget();
     #internals;
 
@@ -57,12 +55,15 @@ class MyInput extends HTMLElement {
     }
 }
 
-customElements.assignFeatures(MyInput, {
+// assignFeatures calls FaceUp.onAssigned which sets static formAssociated = true
+await customElements.assignFeatures(MyInput, {
     faceUp: { spawn: FaceUp }
 });
 
 customElements.define('my-input', MyInput);
 ```
+
+Note: `static formAssociated = true` is set automatically by `FaceUp.onAssigned` — you don't need to declare it yourself.
 
 ## Setting Values
 
@@ -149,10 +150,11 @@ The `state` is stored internally by the browser and passed back to `formStateRes
 
 The host custom element **must**:
 
-1. Set `static formAssociated = true`
-2. Call `this.attachInternals()` in its constructor
-3. Pass the internals via `getSharedContext` in `supportedFeatures`
-4. Forward form lifecycle callbacks to the feature
+1. Call `this.attachInternals()` in its constructor
+2. Pass the internals via `getSharedContext` in `supportedFeatures`
+3. Forward form lifecycle callbacks to the feature
+
+`static formAssociated = true` is handled automatically by `FaceUp.onAssigned` when `assignFeatures` is called.
 
 ## Dev
 
