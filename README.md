@@ -26,7 +26,13 @@ class MyInput extends HTMLElement {
     static supportedFeatures = {
         faceUp: {
             fallbackSpawn: FaceUp,
-            callbackForwarding: ['connectedCallback', 'disconnectedCallback'],
+            callbackForwarding: [
+                'connectedCallback',
+                'disconnectedCallback',
+                'formDisabledCallback',
+                'formResetCallback',
+                'formStateRestoreCallback'
+            ],
             getSharedContext(instance) {
                 return {
                     internals: instance.#internals,
@@ -40,19 +46,6 @@ class MyInput extends HTMLElement {
         super();
         this.#internals = this.attachInternals();
     }
-
-    // Forward form lifecycle callbacks to the feature
-    formDisabledCallback(disabled) {
-        this.faceUp.formDisabledCallback(disabled);
-    }
-
-    formResetCallback() {
-        this.faceUp.formResetCallback();
-    }
-
-    formStateRestoreCallback(state, mode) {
-        this.faceUp.formStateRestoreCallback(state, mode);
-    }
 }
 
 // assignFeatures calls FaceUp.onAssigned which sets static formAssociated = true
@@ -64,6 +57,8 @@ customElements.define('my-input', MyInput);
 ```
 
 Note: `static formAssociated = true` is set automatically by `FaceUp.onAssigned` — you don't need to declare it yourself.
+
+Form lifecycle callbacks (`formDisabledCallback`, `formResetCallback`, `formStateRestoreCallback`) are forwarded automatically via `callbackForwarding` — no manual forwarding code needed in the host element.
 
 ## Setting Values
 
@@ -138,13 +133,15 @@ The `state` is stored internally by the browser and passed back to `formStateRes
 | `reportValidity()` | `boolean` | Shows browser validation UI if invalid |
 | `setValidity(flags, message?, anchor?)` | `void` | Sets custom validity flags |
 
-### Form Lifecycle Methods
+### Form Lifecycle Callbacks (forwarded via `callbackForwarding`)
 
-| Method | Description |
-|--------|-------------|
+| Callback | Description |
+|----------|-------------|
 | `formDisabledCallback(disabled)` | Called when disabled state changes |
 | `formResetCallback()` | Called when the form is reset |
 | `formStateRestoreCallback(state, mode)` | Called when browser restores form state |
+
+These are forwarded automatically by `assign-gingerly`'s `callbackForwarding` mechanism — the host element does not need to implement them manually.
 
 ## Requirements
 
@@ -152,9 +149,9 @@ The host custom element **must**:
 
 1. Call `this.attachInternals()` in its constructor
 2. Pass the internals via `getSharedContext` in `supportedFeatures`
-3. Forward form lifecycle callbacks to the feature
+3. Include the form lifecycle callbacks in `callbackForwarding`
 
-`static formAssociated = true` is handled automatically by `FaceUp.onAssigned` when `assignFeatures` is called.
+Both `static formAssociated = true` and form lifecycle callback forwarding are handled automatically — no manual boilerplate needed in the host element.
 
 ## Dev
 

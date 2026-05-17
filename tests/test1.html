@@ -20,7 +20,13 @@
             static supportedFeatures = {
                 faceUp: {
                     fallbackSpawn: FaceUp,
-                    callbackForwarding: ['connectedCallback', 'disconnectedCallback'],
+                    callbackForwarding: [
+                        'connectedCallback',
+                        'disconnectedCallback',
+                        'formDisabledCallback',
+                        'formResetCallback',
+                        'formStateRestoreCallback'
+                    ],
                     getSharedContext(instance) {
                         return {
                             internals: instance.#internals,
@@ -55,27 +61,6 @@
             // Expose name for form submission
             get name() { return this.getAttribute('name'); }
             get type() { return this.localName; }
-
-            // Form lifecycle callbacks forwarded to the feature
-            formDisabledCallback(disabled) {
-                this.faceUp.formDisabledCallback(disabled);
-                const input = this.shadowRoot.querySelector('input');
-                input.disabled = disabled;
-            }
-
-            formResetCallback() {
-                this.faceUp.formResetCallback();
-                const input = this.shadowRoot.querySelector('input');
-                input.value = '';
-            }
-
-            formStateRestoreCallback(state, mode) {
-                this.faceUp.formStateRestoreCallback(state, mode);
-                if (state) {
-                    const input = this.shadowRoot.querySelector('input');
-                    input.value = typeof state === 'string' ? state : '';
-                }
-            }
         }
 
         // Inject the FaceUp feature (onAssigned sets static formAssociated = true)
