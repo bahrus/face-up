@@ -1,0 +1,20 @@
+{
+  "name": "face-up",
+  "version": "0.0.0",
+  "description": "A Custom Element Feature that Adds Form Associated Behavior to a Custom Element",
+  "homepage": "https://github.com/bahrus/face-it#readme",
+  "bugs": {
+    "url": "https://github.com/bahrus/face-it/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bahrus/face-it.git"
+  },
+  "license": "MIT",
+  "author": "Bruce B. Anderson <anderson.bruce.b@gmail.com>",
+  "type": "module",
+  "main": "FaceIt.js",
+  "scripts": {
+    "test": "playwright test"
+  }
+}
