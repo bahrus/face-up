@@ -2,19 +2,29 @@
   "name": "face-up",
   "version": "0.0.0",
   "description": "A Custom Element Feature that Adds Form Associated Behavior to a Custom Element",
-  "homepage": "https://github.com/bahrus/face-it#readme",
+  "homepage": "https://github.com/bahrus/face-up#readme",
   "bugs": {
-    "url": "https://github.com/bahrus/face-it/issues"
+    "url": "https://github.com/bahrus/face-up/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bahrus/face-it.git"
+    "url": "git+https://github.com/bahrus/face-up.git"
   },
   "license": "MIT",
   "author": "Bruce B. Anderson <anderson.bruce.b@gmail.com>",
   "type": "module",
-  "main": "FaceIt.js",
+  "main": "FaceUp.js",
   "scripts": {
-    "test": "playwright test"
-  }
+    "serve": "node ./node_modules/spa-ssi/serve.js",
+    "test": "playwright test",
+    "update": "ncu -u && npm install",
+    "safari": "npx playwright wk http://localhost:8000",
+    "chrome": "npx playwright cr http://localhost:8000"
+  },
+  "devDependencies": {
+    "assign-gingerly": "0.0.39",
+    "@playwright/test": "1.60.0",
+    "spa-ssi": "0.0.27"
+  },
+  "dependencies": {}
 }

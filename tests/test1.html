@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - FaceUp Feature</title>
+    <!-- #include virtual="/imports.html" -->
+    <script type=module>
+        import 'assign-gingerly/assignFeatures.js';
+        import {FaceUp} from 'face-up/FaceUp.js';
+
+        /**
+         * A test custom element that uses FaceUp to become form-associated.
+         */
+        class TestInput extends HTMLElement {
+            static formAssociated = true;
+
+            propagator = new EventTarget();
+            #internals;
+
+            static supportedFeatures = {
+                faceUp: {
+                    fallbackSpawn: FaceUp,
+                    callbackForwarding: ['connectedCallback', 'disconnectedCallback'],
+                    getSharedContext(instance) {
+                        return {
+                            internals: instance.#internals,
+                            hostPropagator: instance.propagator
+                        };
+                    }
+                }
+            };
+
+            constructor() {
+                super();
+                this.#internals = this.attachInternals();
+                this.attachShadow({ mode: 'open' });
+                this.shadowRoot.innerHTML = `
+                    <style>
+                        :host { display: inline-block; }
+                        input { font: inherit; }
+                    </style>
+                    <input type="text" part="input">
+                `;
+            }
+
+            connectedCallback() {
+                const input = this.shadowRoot.querySelector('input');
+                input.addEventListener('input', () => {
+                    this.propagator.dispatchEvent(
+                        new CustomEvent('value', { detail: input.value })
+                    );
+                });
+            }
+
+            // Expose name for form submission
+            get name() { return this.getAttribute('name'); }
+            get type() { return this.localName; }
+
+            // Form lifecycle callbacks forwarded to the feature
+            formDisabledCallback(disabled) {
+                this.faceUp.formDisabledCallback(disabled);
+                const input = this.shadowRoot.querySelector('input');
+                input.disabled = disabled;
+            }
+
+            formResetCallback() {
+                this.faceUp.formResetCallback();
+                const input = this.shadowRoot.querySelector('input');
+                input.value = '';
+            }
+
+            formStateRestoreCallback(state, mode) {
+                this.faceUp.formStateRestoreCallback(state, mode);
+                if (state) {
+                    const input = this.shadowRoot.querySelector('input');
+                    input.value = typeof state === 'string' ? state : '';
+                }
+            }
+        }
+
+        // Inject the FaceUp feature
+        customElements.assignFeatures(TestInput, {
+            faceUp: { spawn: FaceUp }
+        });
+
+        customElements.define('test-input', TestInput);
+    </script>
+</head>
+<body>
+    <h1>FaceUp Feature Test</h1>
+
+    <form id="test-form">
+        <fieldset>
+            <legend>Form-Associated Custom Element</legend>
+
+            <label>
+                Name:
+                <test-input name="username"></test-input>
+            </label>
+
+            <br><br>
+
+            <label>
+                Required field:
+                <test-input name="required-field" required></test-input>
+            </label>
+
+            <br><br>
+
+            <button type="submit">Submit</button>
+            <button type="reset">Reset</button>
+        </fieldset>
+    </form>
+
+    <h2>Form Data Output</h2>
+    <pre id="output"></pre>
+
+    <script type=module>
+        const form = document.getElementById('test-form');
+        const output = document.getElementById('output');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const entries = [...formData.entries()];
+            output.textContent = JSON.stringify(Object.fromEntries(entries), null, 2);
+        });
+    </script>
+</body>
+</html>
