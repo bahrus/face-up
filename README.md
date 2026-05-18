@@ -20,23 +20,19 @@ import 'assign-gingerly/assignFeatures.js';
 import { FaceUp } from 'face-up/FaceUp.js';
 
 class MyInput extends HTMLElement {
-    propagator = new EventTarget();
     #internals;
 
     static supportedFeatures = {
         faceUp: {
             fallbackSpawn: FaceUp,
             callbackForwarding: [
-                'connectedCallback',
-                'disconnectedCallback',
                 'formDisabledCallback',
                 'formResetCallback',
                 'formStateRestoreCallback'
             ],
             getSharedContext(instance) {
                 return {
-                    internals: instance.#internals,
-                    hostPropagator: instance.propagator
+                    internals: instance.#internals
                 };
             }
         }
@@ -56,26 +52,25 @@ await customElements.assignFeatures(MyInput, {
 customElements.define('my-input', MyInput);
 ```
 
-Note: `static formAssociated = true` is set automatically by `FaceUp.onAssigned` — you don't need to declare it yourself.
+That's it. No propagator, no manual callback forwarding, no event wiring.
 
-Form lifecycle callbacks (`formDisabledCallback`, `formResetCallback`, `formStateRestoreCallback`) are forwarded automatically via `callbackForwarding` — no manual forwarding code needed in the host element.
+- `static formAssociated = true` is set automatically by `FaceUp.onAssigned`.
+- Form lifecycle callbacks are forwarded automatically via `callbackForwarding`.
+- Property changes sync to `ElementInternals` via the feature's setters.
 
 ## Setting Values
 
-Dispatch events on the host's `propagator` to update the form value:
+Because `faceUp` is a getter-only property, `assignGingerly` merges directly into the feature instance. Set properties however you like:
 
 ```js
-// From within the custom element:
-this.propagator.dispatchEvent(
-    new Event('value')
-);
+// Direct property access
+el.faceUp.value = 'hello';
+
+// Via assignGingerly (merges into the feature instance)
+el.assignGingerly({ faceUp: { value: 'hello', required: true } });
 ```
 
-Or set the value directly on the feature instance:
-
-```js
-el.faceUp.value = 'new value';
-```
+Both approaches trigger the setter, which calls `setFormValue()` on the internals automatically.
 
 ## Validation
 
@@ -98,6 +93,8 @@ el.faceUp.validationMessage = '';
 // or
 el.faceUp.setValidity({});
 ```
+
+Built-in `required` validation is automatic — if `required` is `true` and `value` is `null` or `''`, the control is marked invalid with `valueMissing`.
 
 ## Form State Restoration
 
@@ -142,6 +139,20 @@ The `state` is stored internally by the browser and passed back to `formStateRes
 | `formStateRestoreCallback(state, mode)` | Called when browser restores form state |
 
 These are forwarded automatically by `assign-gingerly`'s `callbackForwarding` mechanism — the host element does not need to implement them manually.
+
+## How it integrates
+
+The key insight: because `assignFeatures` installs `faceUp` as a **getter-only** property on the prototype, `assignGingerly` automatically merges object values into the existing feature instance rather than replacing it. This means:
+
+1. The feature's setters fire on every property assignment.
+2. Each setter syncs to `ElementInternals` immediately.
+3. No event bus, no propagator, no intermediate layer — just property access.
+
+```js
+// All of these trigger the setter → sync to internals:
+el.faceUp.value = 'x';
+el.assignGingerly({ faceUp: { value: 'x' } });
+```
 
 ## Requirements
 

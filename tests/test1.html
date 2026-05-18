@@ -11,26 +11,23 @@
 
         /**
          * A test custom element that uses FaceUp to become form-associated.
-         * Note: static formAssociated = true is set automatically by FaceUp.onAssigned
+         * Note: static formAssociated = true is set automatically by FaceUp.onAssigned.
+         * Form lifecycle callbacks are forwarded automatically via callbackForwarding.
          */
         class TestInput extends HTMLElement {
-            propagator = new EventTarget();
             #internals;
 
             static supportedFeatures = {
                 faceUp: {
                     fallbackSpawn: FaceUp,
                     callbackForwarding: [
-                        'connectedCallback',
-                        'disconnectedCallback',
                         'formDisabledCallback',
                         'formResetCallback',
                         'formStateRestoreCallback'
                     ],
                     getSharedContext(instance) {
                         return {
-                            internals: instance.#internals,
-                            hostPropagator: instance.propagator
+                            internals: instance.#internals
                         };
                     }
                 }
@@ -52,9 +49,8 @@
             connectedCallback() {
                 const input = this.shadowRoot.querySelector('input');
                 input.addEventListener('input', () => {
-                    this.propagator.dispatchEvent(
-                        new CustomEvent('value', { detail: input.value })
-                    );
+                    // Simply set the feature property — the setter syncs to internals
+                    this.faceUp.value = input.value;
                 });
             }
 

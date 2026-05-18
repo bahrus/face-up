@@ -17,6 +17,11 @@
  *
  * `static formAssociated = true` is set automatically via `static onAssigned`.
  *
+ * Integration is seamless — because the feature is a getter-only property,
+ * `assignGingerly` merges directly into the instance. The consumer simply
+ * sets properties on the feature (e.g., `el.faceUp.value = x`) and the
+ * setters handle syncing to ElementInternals automatically.
+ *
  * @implements {FaceUpProps}
  */
 class FaceUp {
@@ -25,28 +30,22 @@ class FaceUp {
      * Called once by assignFeatures after registration.
      * Sets `static formAssociated = true` on the host constructor so the
      * consumer doesn't need to declare it manually.
-     * @param {Function} ctr - The custom element constructor
+     * @param {typeof HTMLElement} ctr - The custom element constructor
      * @param {object} _featureConfig - The feature config (unused)
      */
     static onAssigned(ctr, _featureConfig) {
+        // @ts-ignore — formAssociated is a custom element static property
         if (!ctr.formAssociated) {
+            // @ts-ignore
             ctr.formAssociated = true;
         }
     }
+
     /** @type {WeakRef<HTMLElement> | undefined} */
     #hostRef;
 
     /** @type {ElementInternals | undefined} */
     #internals;
-
-    /** @type {AbortController | undefined} */
-    #abortController;
-
-    /** @type {EventTarget | undefined} */
-    #hostPropagator;
-
-    /** @type {boolean} */
-    #hasDisconnected = false;
 
     /** @type {string | File | FormData | null} */
     #value = null;
@@ -72,7 +71,6 @@ class FaceUp {
         this.#hostRef = new WeakRef(hostElement);
         if (ctx.shared) {
             this.#internals = ctx.shared.internals;
-            this.#hostPropagator = ctx.shared.hostPropagator;
         }
         if (initVals) {
             if (initVals.value !== undefined) this.#value = initVals.value;
@@ -80,9 +78,10 @@ class FaceUp {
             if (initVals.disabled !== undefined) this.#disabled = initVals.disabled;
             if (initVals.required !== undefined) this.#required = initVals.required;
             if (initVals.validationMessage !== undefined) this.#validationMessage = initVals.validationMessage;
-            if (initVals.hostPropagator !== undefined) this.#hostPropagator = initVals.hostPropagator;
         }
-        this.#connect();
+        // Sync initial state to internals
+        this.#syncFormValue();
+        this.#validateInternal();
     }
 
     // ─── Public Properties ───────────────────────────────────────────
@@ -115,12 +114,6 @@ class FaceUp {
     set validationMessage(msg) {
         this.#validationMessage = msg;
         this.#validateInternal();
-    }
-
-    get hostPropagator() { return this.#hostPropagator ?? null; }
-    set hostPropagator(v) {
-        this.#hostPropagator = v ?? undefined;
-        this.#reconnectListeners();
     }
 
     // ─── Read-only Form Control Accessors ────────────────────────────
@@ -200,67 +193,7 @@ class FaceUp {
         }
     }
 
-    // ─── Lifecycle (callbackForwarding) ──────────────────────────────
-
-    connectedCallback() {
-        if (this.#hasDisconnected) {
-            this.#hasDisconnected = false;
-            this.#connect();
-        }
-    }
-
-    disconnectedCallback() {
-        this.#hasDisconnected = true;
-        this.#cleanup();
-    }
-
     // ─── Private Methods ─────────────────────────────────────────────
-
-    #connect() {
-        this.#abortController = new AbortController();
-        const signal = this.#abortController.signal;
-
-        // Listen for value/state/required changes from the host propagator
-        if (this.#hostPropagator) {
-            this.#hostPropagator.addEventListener('value', (/** @type {CustomEvent} */ e) => {
-                this.#value = e.detail?.value ?? e.detail;
-                this.#syncFormValue();
-                this.#validateInternal();
-            }, { signal });
-
-            this.#hostPropagator.addEventListener('state', (/** @type {CustomEvent} */ e) => {
-                this.#state = e.detail?.value ?? e.detail;
-                this.#syncFormValue();
-            }, { signal });
-
-            this.#hostPropagator.addEventListener('required', (/** @type {CustomEvent} */ e) => {
-                this.#required = !!(e.detail?.value ?? e.detail);
-                this.#validateInternal();
-            }, { signal });
-
-            this.#hostPropagator.addEventListener('disabled', (/** @type {CustomEvent} */ e) => {
-                this.#disabled = !!(e.detail?.value ?? e.detail);
-            }, { signal });
-        }
-
-        // Sync initial value if already set
-        this.#syncFormValue();
-        this.#validateInternal();
-    }
-
-    #cleanup() {
-        if (this.#abortController) {
-            this.#abortController.abort();
-            this.#abortController = undefined;
-        }
-    }
-
-    #reconnectListeners() {
-        this.#cleanup();
-        if (!this.#hasDisconnected) {
-            this.#connect();
-        }
-    }
 
     /**
      * Syncs the current value (and optional state) to ElementInternals.
