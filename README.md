@@ -1,5 +1,7 @@
 # face-up
 
+**F**orm **A**ssociated **C**ustom **E**lement — **Up**lifted.
+
 A Custom Element Feature that adds Form Associated behavior to a custom element via the [ElementInternals](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals) API.
 
 ## What it does
