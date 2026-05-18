@@ -23,56 +23,66 @@ export const props = {
 };
 
 /**
- * Merges configuration for forwarding properties from the host view model
+ * Creates merges configuration for forwarding properties from the host view model
  * to the faceUp feature instance via roundabout's reactive system.
  *
  * When any of these properties change on the view model, the corresponding
- * setter on `el.faceUp` fires, which syncs to ElementInternals automatically.
+ * setter on the feature fires, which syncs to ElementInternals automatically.
  *
- * Usage in a consumer's cef.mjs:
+ * @param {string} [featureKey='faceUp'] - The feature property name on the host element.
+ * @returns {Merges<FaceUpForwardingProps>}
+ *
+ * @example
  * ```js
- * import { faceUpMerges } from 'face-up/RAConfig.mjs';
+ * import { getFaceUpMerges } from 'face-up/RAConfig.mjs';
  *
  * export const raConfig = {
- *     // ...your other config...
  *     merges: [
- *         ...faceUpMerges,
- *         // ...your other merges...
+ *         ...getFaceUpMerges(),          // uses default 'faceUp' key
+ *         // ...or with a custom key:
+ *         // ...getFaceUpMerges('formControl'),
  *     ]
  * };
  * ```
- *
+ */
+export function getFaceUpMerges(featureKey = 'faceUp') {
+    return [
+        {
+            ifKeyIn: [props.value],
+            assign: {
+                [`?.${featureKey}?.value`]: '?.value'
+            }
+        },
+        {
+            ifKeyIn: [props.state],
+            assign: {
+                [`?.${featureKey}?.state`]: '?.state'
+            }
+        },
+        {
+            ifKeyIn: [props.disabled],
+            assign: {
+                [`?.${featureKey}?.disabled`]: '?.disabled'
+            }
+        },
+        {
+            ifKeyIn: [props.required],
+            assign: {
+                [`?.${featureKey}?.required`]: '?.required'
+            }
+        },
+        {
+            ifKeyIn: [props.validationMessage],
+            assign: {
+                [`?.${featureKey}?.validationMessage`]: '?.validationMessage'
+            }
+        },
+    ];
+}
+
+/**
+ * Pre-built merges using the default 'faceUp' feature key.
+ * Convenience export for the common case.
  * @type {Merges<FaceUpForwardingProps>}
  */
-export const faceUpMerges = [
-    {
-        ifKeyIn: [props.value],
-        assign: {
-            '?.faceUp?.value': '?.value'
-        }
-    },
-    {
-        ifKeyIn: [props.state],
-        assign: {
-            '?.faceUp?.state': '?.state'
-        }
-    },
-    {
-        ifKeyIn: [props.disabled],
-        assign: {
-            '?.faceUp?.disabled': '?.disabled'
-        }
-    },
-    {
-        ifKeyIn: [props.required],
-        assign: {
-            '?.faceUp?.required': '?.required'
-        }
-    },
-    {
-        ifKeyIn: [props.validationMessage],
-        assign: {
-            '?.faceUp?.validationMessage': '?.validationMessage'
-        }
-    },
-];
+export const faceUpMerges = getFaceUpMerges();
