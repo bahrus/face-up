@@ -164,6 +164,24 @@ The host custom element **must**:
 
 Both `static formAssociated = true` and form lifecycle callback forwarding are handled automatically — no manual boilerplate needed in the host element.
 
+## Roundabout Integration
+
+For projects using [roundabout](https://github.com/bahrus/roundabout), `face-up` exports merge rules that wire up property forwarding automatically:
+
+```js
+import { faceUpMerges } from 'face-up/RAConfig.mjs';
+
+export const raConfig = {
+    propagate: ['value', 'disabled', 'required', /* ... */],
+    merges: [
+        ...faceUpMerges,
+        // ...your other merges
+    ]
+};
+```
+
+When `value`, `state`, `disabled`, `required`, or `validationMessage` change on the view model, roundabout forwards them to the `faceUp` feature's setters, which sync to `ElementInternals` automatically.
+
 ## Dev
 
 ```bash
