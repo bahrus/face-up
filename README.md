@@ -174,6 +174,7 @@ For projects using [roundabout](https://github.com/bahrus/roundabout), `face-up`
 import { faceUpMerges } from 'face-up/RAConfig.mjs';
 
 export const raConfig = {
+    //optional
     propagate: ['value', 'disabled', 'required', /* ... */],
     merges: [
         ...faceUpMerges,
