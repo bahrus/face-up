@@ -1,7 +1,6 @@
 // @ts-check
-/** @import {FaceUpProps, AllProps, FeatureSpawnContext, 
- * FaceUpSharedContext, ValidationFlags, CustomData} from './types/face-up/types' */
- /** @import {FeatureConfig} from './types/assign-gingerly/types' */
+/** @import {FaceUpProps, FeatureSpawnContext, ValidationFlags} from './types/face-up/types' */
+/** @import {FeatureConfig} from './types/assign-gingerly/types' */
 
 /**
  * FaceUp — A Custom Element Feature that adds Form Associated behavior
@@ -43,78 +42,8 @@ class FaceUp {
             ctr.formAssociated = true;
         }
         if(_featureConfig.customData.integrateWithRoundabout){
-            const id = (await import('roundabout-lib/roundaboutFeature.js')).id;
-            /**
-             * Property key constants for FaceUp-relevant forwarding.
-             * @type {{ [K in keyof FaceUpProps]: K }}
-             */
-            const props = {
-                value: 'value',
-                state: 'state',
-                disabled: 'disabled',
-                required: 'required',
-                validationMessage: 'validationMessage',
-            };
-            (await import('assign-gingerly/assignFeatures.js')).suggestFeatureInfo(FaceUp, id, {
-                customData: {
-                    '?.raConfig?.merges +=': [
-                        {
-                            ifKeyIn: [props.value],
-                            assign: {
-                                [`?.${key}?.value`]: '?.value'
-                            }
-                        },
-                        {
-                            ifKeyIn: [props.state],
-                            assign: {
-                                [`?.${key}?.state`]: '?.state'
-                            }
-                        },
-                        {
-                            ifKeyIn: [props.disabled],
-                            assign: {
-                                [`?.${key}?.disabled`]: '?.disabled'
-                            }
-                        },
-                        {
-                            ifKeyIn: [props.required],
-                            assign: {
-                                [`?.${key}?.required`]: '?.required'
-                            }
-                        },
-                        {
-                            ifKeyIn: [props.validationMessage],
-                            assign: {
-                                [`?.${key}?.validationMessage`]: '?.validationMessage'
-                            }
-                        },
-                    ]
-                },
-                withAttrs: {
-                    [props.value]: props.value,
-                    [`_${props.value}`]: {
-                        sourceOfTruth: true,
-                        valIfNull: null,
-                    },
-                    [props.disabled]: props.disabled,
-                    [`_${props.disabled}`]: {
-                        sourceOfTruth: true,
-                        instanceOf: Boolean,
-                        valIfNull: false,
-                    },
-                    [props.required]: props.required,
-                    [`_${props.required}`]: {
-                        sourceOfTruth: true,
-                        instanceOf: Boolean,
-                        valIfNull: false,
-                    },
-                    [props.validationMessage]: 'validation-message',
-                    [`_${props.validationMessage}`]: {
-                        sourceOfTruth: true,
-                        valIfNull: '',
-                    },
-                }
-            }, ctr);
+            const { integrateWithRoundabout } = await import('./integrateWithRoundabout.js');
+            await integrateWithRoundabout(FaceUp, key, ctr);
         }
     }
 
