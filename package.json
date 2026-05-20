@@ -26,11 +26,11 @@
     "chrome": "npx playwright cr http://localhost:8000"
   },
   "devDependencies": {
-    "assign-gingerly": "0.0.45",
+    "assign-gingerly": "0.0.47",
     "@playwright/test": "1.60.0",
     "spa-ssi": "0.0.27"
   },
   "dependencies": {
-    "roundabout-lib": "0.0.18"
+    "roundabout-lib": "0.0.19"
   }
 }

@@ -1,19 +1,11 @@
 // @ts-check
 /** @import {Merges} from './types/roundabout/types.d.ts' */
 /** @import {AttrPatterns} from './types/assign-gingerly/types.d.ts' */
-
-/**
- * @typedef {object} FaceUpForwardingProps
- * @property {string | File | FormData | null} value
- * @property {string | File | FormData | null} state
- * @property {boolean} disabled
- * @property {boolean} required
- * @property {string} validationMessage
- */
+/** @import {FaceUpProps} from './types/face-up/types.d.ts' */
 
 /**
  * Property key constants for FaceUp-relevant forwarding.
- * @type {{ [K in keyof FaceUpForwardingProps]: K }}
+ * @type {{ [K in keyof FaceUpProps]: K }}
  */
 export const props = {
     value: 'value',
@@ -31,7 +23,7 @@ export const props = {
  * setter on the feature fires, which syncs to ElementInternals automatically.
  *
  * @param {string} [featureKey='faceUp'] - The feature property name on the host element.
- * @returns {Merges<FaceUpForwardingProps>}
+ * @returns {Merges<FaceUpProps>}
  *
  * @example
  * ```js
@@ -84,7 +76,7 @@ export function getFaceUpMerges(featureKey = 'faceUp') {
 /**
  * Pre-built merges using the default 'faceUp' feature key.
  * Convenience export for the common case.
- * @type {Merges<FaceUpForwardingProps>}
+ * @type {Merges<FaceUpProps>}
  */
 export const faceUpMerges = getFaceUpMerges();
 
@@ -93,7 +85,7 @@ export const faceUpMerges = getFaceUpMerges();
  * All are marked `sourceOfTruth: true` so truth-sourcer can sync them back
  * to attributes, and each specifies `valIfNull` for proper defaults.
  *
- * @type {AttrPatterns<FaceUpForwardingProps>}
+ * @type {AttrPatterns<FaceUpProps>}
  *
  * @example
  * ```js

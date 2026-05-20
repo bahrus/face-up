@@ -1,5 +1,7 @@
 // @ts-check
-/** @import {FaceUpProps, AllProps, FeatureSpawnContext, FaceUpSharedContext, ValidationFlags} from './types/face-up/types' */
+/** @import {FaceUpProps, AllProps, FeatureSpawnContext, 
+ * FaceUpSharedContext, ValidationFlags, CustomData} from './types/face-up/types' */
+ /** @import {FeatureConfig} from './types/assign-gingerly/types' */
 
 /**
  * FaceUp — A Custom Element Feature that adds Form Associated behavior
@@ -31,13 +33,88 @@ class FaceUp {
      * Sets `static formAssociated = true` on the host constructor so the
      * consumer doesn't need to declare it manually.
      * @param {typeof HTMLElement} ctr - The custom element constructor
-     * @param {object} _featureConfig - The feature config (unused)
+     * @param {FeatureConfig} _featureConfig - The feature config (unused)
+     * @param {string} key
      */
-    static onAssigned(ctr, _featureConfig) {
+    static async onAssigned(ctr, _featureConfig, key) {
         // @ts-ignore — formAssociated is a custom element static property
         if (!ctr.formAssociated) {
             // @ts-ignore
             ctr.formAssociated = true;
+        }
+        if(_featureConfig.customData.integrateWithRoundabout){
+            const id = (await import('roundabout-lib/roundaboutFeature.js')).id;
+            /**
+             * Property key constants for FaceUp-relevant forwarding.
+             * @type {{ [K in keyof FaceUpProps]: K }}
+             */
+            const props = {
+                value: 'value',
+                state: 'state',
+                disabled: 'disabled',
+                required: 'required',
+                validationMessage: 'validationMessage',
+            };
+            (await import('assign-gingerly/assignFeatures.js')).suggestFeatureInfo(FaceUp, id, {
+                customData: {
+                    '?.raConfig?.merges +=': [
+                        {
+                            ifKeyIn: [props.value],
+                            assign: {
+                                [`?.${key}?.value`]: '?.value'
+                            }
+                        },
+                        {
+                            ifKeyIn: [props.state],
+                            assign: {
+                                [`?.${key}?.state`]: '?.state'
+                            }
+                        },
+                        {
+                            ifKeyIn: [props.disabled],
+                            assign: {
+                                [`?.${key}?.disabled`]: '?.disabled'
+                            }
+                        },
+                        {
+                            ifKeyIn: [props.required],
+                            assign: {
+                                [`?.${key}?.required`]: '?.required'
+                            }
+                        },
+                        {
+                            ifKeyIn: [props.validationMessage],
+                            assign: {
+                                [`?.${key}?.validationMessage`]: '?.validationMessage'
+                            }
+                        },
+                    ]
+                },
+                withAttrs: {
+                    [props.value]: props.value,
+                    [`_${props.value}`]: {
+                        sourceOfTruth: true,
+                        valIfNull: null,
+                    },
+                    [props.disabled]: props.disabled,
+                    [`_${props.disabled}`]: {
+                        sourceOfTruth: true,
+                        instanceOf: Boolean,
+                        valIfNull: false,
+                    },
+                    [props.required]: props.required,
+                    [`_${props.required}`]: {
+                        sourceOfTruth: true,
+                        instanceOf: Boolean,
+                        valIfNull: false,
+                    },
+                    [props.validationMessage]: 'validation-message',
+                    [`_${props.validationMessage}`]: {
+                        sourceOfTruth: true,
+                        valIfNull: '',
+                    },
+                }
+            }, ctr);
         }
     }
 
