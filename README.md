@@ -168,10 +168,10 @@ Both `static formAssociated = true` and form lifecycle callback forwarding are h
 
 ## Roundabout Integration
 
-For projects using [roundabout](https://github.com/bahrus/roundabout), `face-up` exports merge rules that wire up property forwarding automatically:
+For projects using [roundabout](https://github.com/bahrus/roundabout), `face-up` exports merge rules and attribute patterns that wire up property forwarding automatically:
 
 ```js
-import { faceUpMerges } from 'face-up/RAConfig.mjs';
+import { faceUpMerges, faceUpWithAttrs } from 'face-up/RAConfig.mjs';
 
 export const raConfig = {
     //optional
@@ -181,9 +181,42 @@ export const raConfig = {
         // ...your other merges
     ]
 };
+
+export const cef = {
+    features: {
+        roundabout: {
+            customData: { raConfig },
+            withAttrs: {
+                ...faceUpWithAttrs,
+                // ...your other attrs
+            }
+        }
+    }
+};
 ```
 
+### Merges
+
 When `value`, `state`, `disabled`, `required`, or `validationMessage` change on the view model, roundabout forwards them to the `faceUp` feature's setters, which sync to `ElementInternals` automatically.
+
+If you use a different feature key, call the function form:
+
+```js
+import { getFaceUpMerges } from 'face-up/RAConfig.mjs';
+
+merges: [...getFaceUpMerges('formControl')]
+```
+
+### Attribute Patterns (`faceUpWithAttrs`)
+
+Provides `withAttrs` configuration for parsing form-associated attributes from markup. All entries are `sourceOfTruth: true` with appropriate `valIfNull` defaults:
+
+| Attribute | Property | Type | Default |
+|-----------|----------|------|---------|
+| `value` | `value` | String | `null` |
+| `disabled` | `disabled` | Boolean | `false` |
+| `required` | `required` | Boolean | `false` |
+| `validation-message` | `validationMessage` | String | `''` |
 
 ## Dev
 

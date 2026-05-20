@@ -1,5 +1,6 @@
 // @ts-check
 /** @import {Merges} from './types/roundabout/types.d.ts' */
+/** @import {AttrPatterns} from './types/assign-gingerly/types.d.ts' */
 
 /**
  * @typedef {object} FaceUpForwardingProps
@@ -86,3 +87,51 @@ export function getFaceUpMerges(featureKey = 'faceUp') {
  * @type {Merges<FaceUpForwardingProps>}
  */
 export const faceUpMerges = getFaceUpMerges();
+
+/**
+ * Attribute patterns for parsing form-associated attributes into initVals.
+ * All are marked `sourceOfTruth: true` so truth-sourcer can sync them back
+ * to attributes, and each specifies `valIfNull` for proper defaults.
+ *
+ * @type {AttrPatterns<FaceUpForwardingProps>}
+ *
+ * @example
+ * ```js
+ * import { faceUpWithAttrs } from 'face-up/RAConfig.mjs';
+ *
+ * export const cef = {
+ *     features: {
+ *         roundabout: {
+ *             withAttrs: {
+ *                 ...faceUpWithAttrs,
+ *                 // ...your other attrs
+ *             }
+ *         }
+ *     }
+ * };
+ * ```
+ */
+export const faceUpWithAttrs = {
+    [props.value]: props.value,
+    [`_${props.value}`]: {
+        sourceOfTruth: true,
+        valIfNull: null,
+    },
+    [props.disabled]: props.disabled,
+    [`_${props.disabled}`]: {
+        sourceOfTruth: true,
+        instanceOf: Boolean,
+        valIfNull: false,
+    },
+    [props.required]: props.required,
+    [`_${props.required}`]: {
+        sourceOfTruth: true,
+        instanceOf: Boolean,
+        valIfNull: false,
+    },
+    [props.validationMessage]: 'validation-message',
+    [`_${props.validationMessage}`]: {
+        sourceOfTruth: true,
+        valIfNull: '',
+    },
+};
