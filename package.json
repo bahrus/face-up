@@ -1,6 +1,6 @@
 {
   "name": "face-up",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A Custom Element Feature that Adds Form Associated Behavior to a Custom Element",
   "homepage": "https://github.com/bahrus/face-up#readme",
   "bugs": {
