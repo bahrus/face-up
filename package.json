@@ -31,6 +31,6 @@
     "spa-ssi": "0.0.27"
   },
   "dependencies": {
-    "roundabout-lib": "0.0.29"
+    "roundabout-lib": "0.0.30"
   }
 }
