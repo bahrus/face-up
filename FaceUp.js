@@ -41,7 +41,7 @@ class FaceUp {
             // @ts-ignore
             ctr.formAssociated = true;
         }
-        if(_featureConfig.customData.integrateWithRoundabout){
+        if(_featureConfig.customData?.integrateWithRoundabout){
             const { integrateWithRoundabout } = await import('./integrateWithRoundabout.js');
             await integrateWithRoundabout(FaceUp, key, ctr);
         }
@@ -79,11 +79,12 @@ class FaceUp {
             this.#internals = ctx.shared.internals;
         }
         if (initVals) {
-            if (initVals.value !== undefined) this.#value = initVals.value;
-            if (initVals.state !== undefined) this.#state = initVals.state;
-            if (initVals.disabled !== undefined) this.#disabled = initVals.disabled;
-            if (initVals.required !== undefined) this.#required = initVals.required;
-            if (initVals.validationMessage !== undefined) this.#validationMessage = initVals.validationMessage;
+            const { value, state, disabled, required, validationMessage } = initVals;
+            if (value !== undefined) this.#value = value;
+            if (state !== undefined) this.#state = state;
+            if (disabled !== undefined) this.#disabled = disabled;
+            if (required !== undefined) this.#required = required;
+            if (validationMessage !== undefined) this.#validationMessage = validationMessage;
         }
         // Sync initial state to internals
         this.#syncFormValue();
