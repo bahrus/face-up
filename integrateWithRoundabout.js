@@ -28,7 +28,7 @@ export async function integrateWithRoundabout(FaceUpClass, key, ctr) {
 
     suggestFeatureInfo(FaceUpClass, id, {
         customData: {
-            '?.raConfig?.propagate +=': [props.name],
+            '?.raConfig?.propagate?.name': '',
             '?.raConfig?.merges +=': [
                 {
                     ifKeyIn: [props.value],
