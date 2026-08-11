@@ -28,7 +28,7 @@ export async function integrateWithRoundabout(FaceUpClass, key, ctr) {
 
     suggestFeatureInfo(FaceUpClass, id, {
         customData: {
-            '?.raConfig?.propagate?.name': '',
+            '?.raConfig?.propagate +=': ['name'],
             '?.raConfig?.merges +=': [
                 {
                     ifKeyIn: [props.value],
@@ -88,7 +88,6 @@ export async function integrateWithRoundabout(FaceUpClass, key, ctr) {
             [props.name]: props.name,
             [`_${props.name}`]: {
                 sourceOfTruth: true,
-                valIfNull: '',
             }
         }
     }, ctr);
