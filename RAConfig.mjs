@@ -1,7 +1,7 @@
 // @ts-check
 /** @import {Merges} from './types/roundabout/types.d.ts' */
 /** @import {AttrPatterns} from './types/assign-gingerly/types.d.ts' */
-/** @import {FaceUpProps} from './types/face-up/types.d.ts' */
+/** @import {FaceUpProps} from './types/face-up/types.js' */
 
 /**
  * Property key constants for FaceUp-relevant forwarding.
@@ -13,6 +13,7 @@ export const props = {
     disabled: 'disabled',
     required: 'required',
     validationMessage: 'validationMessage',
+    name: 'name',
 };
 
 /**
@@ -126,4 +127,9 @@ export const faceUpWithAttrs = {
         sourceOfTruth: true,
         valIfNull: '',
     },
+    [props.name]: props.name,
+    [`_${props.name}`]: {
+        sourceOfTruth: true,
+        valIfNull: '',
+    }
 };
