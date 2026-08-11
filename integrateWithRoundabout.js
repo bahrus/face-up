@@ -11,6 +11,7 @@ const props = {
     disabled: 'disabled',
     required: 'required',
     validationMessage: 'validationMessage',
+    name: 'name',
 };
 
 /**
@@ -27,6 +28,7 @@ export async function integrateWithRoundabout(FaceUpClass, key, ctr) {
 
     suggestFeatureInfo(FaceUpClass, id, {
         customData: {
+            '?.raConfig?.propagate +=': [props.name],
             '?.raConfig?.merges +=': [
                 {
                     ifKeyIn: [props.value],
@@ -83,6 +85,11 @@ export async function integrateWithRoundabout(FaceUpClass, key, ctr) {
                 sourceOfTruth: true,
                 valIfNull: '',
             },
+            [props.name]: props.name,
+            [`_${props.name}`]: {
+                sourceOfTruth: true,
+                valIfNull: '',
+            }
         }
     }, ctr);
 }
