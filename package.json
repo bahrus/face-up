@@ -1,6 +1,6 @@
 {
   "name": "face-up",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A Custom Element Feature that Adds Form Associated Behavior to a Custom Element",
   "homepage": "https://github.com/bahrus/face-up#readme",
   "bugs": {
@@ -26,7 +26,7 @@
     "chrome": "npx playwright cr http://localhost:8000"
   },
   "devDependencies": {
-    "assign-gingerly": "0.0.75",
+    "assign-gingerly": "0.0.78",
     "@playwright/test": "1.62.1",
     "spa-ssi": "0.0.27"
   },
